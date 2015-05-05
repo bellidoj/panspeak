@@ -2,47 +2,55 @@
 
 from subprocess import call
 import re
+import argparse
 
-documento = 'escrito'
+parser = argparse.ArgumentParser(prog='Panspeak')
+parser.add_argument('--speech',
+    action='store_true',
+     help='speech help')
+
+parser.add_argument('--text',
+    action='store_true',
+    help='text help')
+
+args = parser.parse_args()
 
 
 
+def translate(mode, document):
 
+  pattern = re.compile(r'#-(?P<text>.*?)\|(?P<speech>.*?)-#')   
+  matches = re.finditer(pattern, document)
 
+  if matches:
+      if mode == 'text':
+        for iter in matches:
+          change = iter.group('text')
+          document = pattern.sub(change.strip(), document, count = 1)
+        print document
+      if mode == 'speech':
+        for iter in matches:
+          change = iter.group('speech')
+          document = pattern.sub(change.strip(), document, count = 1)
+        call(["espeak", "-v", "es", document])
 
-def compilar(modo, cadena):
-
-  patron = re.compile(r'#-(?P<writed>.*?)\|(?P<talked>.*?)-#')   
-  aciertos = re.finditer(patron, cadena)
-
-
-  if aciertos:
-    print "Hubo " + str(aciertos) + " coincidencias"
-    print "\n"
-
-    for iter in aciertos:
-      print "writed: " + iter.group('writed')
-      print "talked: " + iter.group('talked')
-      print "-----------------------"
-    		
-      if modo == 'escrito':
-        reemplazo = iter.group('writed')
-      elif modo == 'hablado':
-        reemplazo = iter.group('talked')
-    
-      cadena = patron.sub(reemplazo.strip(), cadena, count = 1)
-
-    return cadena
   else:
-    print "No hubo coincidencias"
+    print "There was no matches"
  
+def get_mode():
+  if args.speech:
+    return "speech"
+  elif args.text:
+    return "text"
+       
 def main():
   print "Panspeak 0.1"
   print "============"
   print "\n"
 
-  cadena = "Este es un texto #- escrito | hablado -# en el que tengo que elejir si digo #- 1 | un -# #- m | metro -#."
-  print compilar("hablado", cadena)
-  call(["espeak", "-v", "es", compilar("hablado", cadena)])
+  document_mode = get_mode()
+  document = "Este es un texto #- escrito | hablado -# en el que tengo que elejir si digo #- 1 | un -# #- m | metro -#."
+  translate(document_mode, document)
+
 main()
 
