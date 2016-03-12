@@ -1,56 +1,64 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 
 from subprocess import call
 import re
 import argparse
 
-parser = argparse.ArgumentParser(prog='Panspeak')
-parser.add_argument('--speech',
-    action='store_true',
-     help='speech help')
+parser = argparse.ArgumentParser(prog='panspeak.py')
 
-parser.add_argument('--text',
-    action='store_true',
-    help='text help')
+parser.add_argument('--mode', help='mode help')
+parser.add_argument('--input', help='input help')
+parser.add_argument('--output', help='output help')
 
 args = parser.parse_args()
 
-
-
 def translate(mode, document):
-
-  pattern = re.compile(r'#-(?P<text>.*?)\|(?P<speech>.*?)-#')   
-  matches = re.finditer(pattern, document)
-
-  if matches:
-      if mode == 'text':
-        for iter in matches:
-          change = iter.group('text')
-          document = pattern.sub(change.strip(), document, count = 1)
-        print document
-      if mode == 'speech':
-        for iter in matches:
-          change = iter.group('speech')
-          document = pattern.sub(change.strip(), document, count = 1)
-        call(["espeak", "-v", "es", document])
-
-  else:
-    print "There was no matches"
+  output_file = open(args.output, 'w')
+  pattern = re.compile(r'#-(?P<text>.*?)\|(?P<speech>.*?)-#')
+  input_file = open(document, 'r')
  
+
+  for line in input_file.readlines():
+    if not line.strip():
+      output_file.write('\n')
+    else:
+      while True:
+        match = re.search(pattern, line)
+        # sustituye el patron por el grupo una unica vez
+        # si no hay coincidencia continua buscando mas patrones en esa linea 
+        if match: 
+          line = re.sub(pattern, match.group(mode), line, 1)
+        else:
+          break
+
+      output_file.write(line)
+
+  output_file.close()
+  panete = open(args.output, 'r')
+  # print panete.read()
+  data = panete.read()
+  call(["espeak", "-v", "es", "-w", "panete.wav", data])
+
 def get_mode():
-  if args.speech:
-    return "speech"
-  elif args.text:
-    return "text"
-       
+  mode = str(args.mode)  
+  if mode == "speech":
+    mode = 1
+  elif mode == "text":
+    mode = 2
+  else:
+    mode = 1
+  return int(mode)
+
+def get_file():
+  file_object = open(args.input, 'r')
+  return file_object
+
 def main():
   print "Panspeak 0.1"
   print "============"
   print "\n"
+  print "Analyzing " + str(args.input) + " in " + str(args.mode) + " mode."
 
-  document_mode = get_mode()
-  document = "Este es un texto #- escrito | hablado -# en el que tengo que elejir si digo #- 1 | un -# #- m | metro -#."
-  translate(document_mode, document)
+  translate(get_mode(), str(args.input))
 
 main()
-
