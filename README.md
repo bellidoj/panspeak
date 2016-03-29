@@ -8,13 +8,25 @@ The differences between readable and tts versions have to be enclosed following 
 
     #-WRITE VERSION|TTS VERSION-#
 
-so if you have something like: It is 2" wide you ended with:
+so if you have something like: 
 
-    It is 2#-"| inches-# wide
+        It is 2" wide 
+
+you ended with:
+
+        It is 2#-"| inches-# wide
+
 
 that will give you:
 
- -  readable version: It is 2" wide
- -  tts version: It is 2 inches wide
+-   readable version: It is 2" wide
+-   tts version: It is 2 inches wide
 
  
+# Version
+
+## 0.2
+
+-   Save As
+-   Edit Menu to add marks (Ctrl + M).
+-   Preferences menú added. You can enable the tts conversion (lame required). 
