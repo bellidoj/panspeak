@@ -6,6 +6,16 @@ import re
 from gi.repository import Gtk
 from contextlib import closing
 
+mypath = os.path.join(os.path.expanduser("~"), ".panspeak")
+
+if os.path.exists(mypath):
+    print("Todo bien")
+    pass
+else:
+    print("no existe el directorio de preferencias")
+    os.mkdir(mypath)
+    pass
+
 class myMain:
 
     
@@ -123,7 +133,7 @@ class myMain:
         dialog.add_button("Cancelar", Gtk.ResponseType.CANCEL)
         dialog.add_button("Guardar", Gtk.ResponseType.ACCEPT)
 
-        dialog.set_current_name(self.documentName)
+        dialog.set_current_name(os.path.basename(self.documentName))
         dialog.set_do_overwrite_confirmation(True)
         
         self.add_filters(dialog)
